@@ -126,6 +126,11 @@
     th {
       background: #eee;
     }
+    .download-link {
+      display: block;
+      margin: 20px 0;
+      text-align: center;
+    }
     
   </style>
 </head>
@@ -147,7 +152,7 @@
             </div>
           </div>
 
-          <input type="file" name="sua" id="fileInputSua" required style="display: none;" />
+          <input type="file" name="sua" id="fileInputSua" style="display: none;" />
 
           <label for="suaSheet">Hoja:</label>
           <input type="text" name="suaSheet" placeholder="Ej. Hoja1" />
@@ -167,7 +172,7 @@
               <p class="card-text" id="nameData">Click para subir archivo</p>
             </div>
           </div>
-          <input type="file" name="data" id="fileInputData" required  style="display: none;"/>
+          <input type="file" name="data" id="fileInputData" style="display: none;"/>
 
           <label for="dataSheet">Hoja:</label>
           <input type="text" name="dataSheet" placeholder="Ej. Hoja1" />
@@ -181,30 +186,58 @@
       <div class="options">
         <label><input type="checkbox" name="removeAccents" value="true" /> Quitar acentos</label>
         <label><input type="checkbox" name="trimSpaces" value="true" /> Quitar espacios extra</label>
+        <label><input type="checkbox" name="showMissing" value="true" checked /> Mostrar no coincidentes</label>
+        <label><input type="checkbox" name="showMatches" value="true" /> Mostrar coincidentes</label>
+        <label><input type="checkbox" name="exportResults" value="true" /> Exportar resultados a XLSX</label>
       </div>
 
-      <button type="submit">Comparar Archivos</button>
+      <button type="submit">Aplicar y Comparar</button>
     </form>
 
     <div id="spinner" class="spinner"></div>
 
     <!-- Resultados -->
-    <% if (results && results.length > 0) { %>
+    <% if (showMissing && missing && missing.length > 0) { %>
       <div class="results">
         <h2>⚠️ Nombres en DATA que no están en SUA</h2>
-        <p>Total: <strong><%= results.length %></strong></p>
+        <p>Total: <strong><%= missing.length %></strong></p>
         <table>
           <thead><tr><th>Nombre</th></tr></thead>
           <tbody>
-            <% results.forEach(name => { %>
+            <% missing.forEach(name => { %>
               <tr><td><%= name %></td></tr>
             <% }) %>
           </tbody>
         </table>
       </div>
-    <% } else if (results) { %>
+    <% } else if (showMissing && missing) { %>
       <div class="results">
-        <h2>✅ Todos los nombres de DATA están en SUA</h2>
+        <h2>✅ No hay nombres en DATA que falten en SUA</h2>
+      </div>
+    <% } %>
+
+    <% if (showMatches && matches && matches.length > 0) { %>
+      <div class="results">
+        <h2>✅ Nombres en DATA que coinciden en SUA</h2>
+        <p>Total: <strong><%= matches.length %></strong></p>
+        <table>
+          <thead><tr><th>Nombre</th></tr></thead>
+          <tbody>
+            <% matches.forEach(name => { %>
+              <tr><td><%= name %></td></tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else if (showMatches && matches) { %>
+      <div class="results">
+        <h2>⚠️ No hay coincidencias</h2>
+      </div>
+    <% } %>
+
+    <% if (exportFilename) { %>
+      <div class="download-link">
+        <a href="/download/<%= exportFilename %>" download>📥 Descargar XLSX de resultados</a>
       </div>
     <% } %>
   </div>
